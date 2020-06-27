@@ -2,17 +2,36 @@ package ru.peltikhin.models.elements;
 
 public class Element {
     private ElementType elementType;
-    private Boolean isOpen;
     private Integer period;
     private Integer firstMoveTime;
     private Integer altitude;
+    private Boolean isOpen = false;
+    private Boolean isContainBall = false;
+    private Boolean isStart = false;
+    private Boolean isEnd = false;
 
-    public Element(ElementType elementType, Boolean isOpen, Integer period, Integer firstMoveTime, Integer altitude) {
-        this.elementType = elementType;
-        this.isOpen = isOpen;
-        this.period = period;
-        this.firstMoveTime = firstMoveTime;
-        this.altitude = altitude;
+    public Boolean getContainBall() {
+        return isContainBall;
+    }
+
+    public void setContainBall(Boolean containBall) {
+        isContainBall = containBall;
+    }
+
+    public Boolean getStart() {
+        return isStart;
+    }
+
+    public void setStart(Boolean start) {
+        isStart = start;
+    }
+
+    public Boolean getEnd() {
+        return isEnd;
+    }
+
+    public void setEnd(Boolean end) {
+        isEnd = end;
     }
 
     public Element() {
@@ -66,5 +85,35 @@ public class Element {
 
     public ElementType getElementType() {
         return elementType;
+    }
+
+    public String getView() {
+        if(isContainBall){
+            return "[o]";
+        }
+        if(elementType == ElementType.WALL){
+            return "[X]";
+        } else if (elementType == ElementType.ROOM){
+            return "[" + altitude.toString() + "]";
+        } else {
+            if(isOpen){
+                return "[" + altitude.toString() + "]";
+            } else {
+                return "[X]";
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getElementType().getType()+ ":" + getAltitude()+ ":" +getFirstMoveTime() +":" +getPeriod() + " ";
+    }
+
+    public Boolean getIsContainBall() {
+        return isContainBall;
+    }
+
+    public void setIsContainBall(Boolean isContainBall) {
+        this.isContainBall = isContainBall;
     }
 }

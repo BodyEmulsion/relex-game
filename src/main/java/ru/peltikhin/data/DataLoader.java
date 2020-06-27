@@ -41,6 +41,8 @@ public class DataLoader {
                             case ROOM:
                                 resultElement.setElementType(ElementType.ROOM);
                                 resultElement.setAltitude(Integer.parseInt(parameters.get(1)));
+                                resultElement.setStart(Boolean.getBoolean(parameters.get(2)));
+                                resultElement.setEnd(Boolean.getBoolean(parameters.get(3)));
                                 break;
                             case CLOSABLE_WALL:
                                 resultElement.setElementType(ElementType.CLOSABLE_WALL);
@@ -70,9 +72,6 @@ public class DataLoader {
                 if(i==8){
                     j++;
                     i=0;
-                }
-                if(j==8){
-                    System.err.println("WRONG INPUT FORMAT");
                 }
             }
             return new Field(field);
