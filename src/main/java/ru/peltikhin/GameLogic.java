@@ -1,20 +1,44 @@
 package ru.peltikhin;
 
+import ru.peltikhin.data.DataLoader;
 import ru.peltikhin.models.Directions;
 import ru.peltikhin.models.Field;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class GameLogic {
     private Field gameField;
-    private int gameTime = 0;
-    private boolean gameWorking = true;
-    private boolean wined = false;
+    private DataLoader dataLoader;
+    private int gameTime;
+    private boolean gameWorking;
+    private boolean wined;
 
-    public GameLogic(Field gameField) {
-        this.gameField = gameField;
+    public GameLogic(DataLoader dataLoader,int m) throws IOException {
+        this.gameField = dataLoader.getField();
+        this.dataLoader = dataLoader;
+        gameTime = m;
+        gameWorking = true;
+        wined = false;
+    }
+
+    public void startGame() throws InterruptedException, IOException {
+        System.out.println(gameField.getFieldView());
+        System.out.println("Game started!");
+        while (gameWorking){
+            gameField.ReverseDynamicWalls(gameTime);
+            System.out.println(gameField.getFieldView());
+            ballMove();
+            gameField.ReverseDynamicWalls(gameTime);
+            gameTime++;
+            Thread.sleep(1000);
+        }
+        System.out.println("Game ended!");
+        System.out.println(gameField.getFieldView());
+        System.out.println(wined);
+        dataLoader.saveResult(String.valueOf(wined));
     }
 
     public void ballMove(){
@@ -36,20 +60,5 @@ public class GameLogic {
     }
 
 
-    public void startGame() {
-        System.out.println(gameField.getFieldView());
-        while (gameWorking){
-            gameField.ReverseDynamicWalls(gameTime);
-            System.out.println(gameField.getFieldView());
-            ballMove();
-            gameField.ReverseDynamicWalls(gameTime);
-            gameTime++;
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println(gameField.getFieldView());
-    }
+
 }

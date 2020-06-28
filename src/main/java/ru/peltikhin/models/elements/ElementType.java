@@ -14,6 +14,19 @@ public enum ElementType {
         this.type = type;
     }
 
+    public boolean getStartPosition(){
+        switch (this){
+            case OPENABLE_WALL:
+            case WALL:
+                return false;
+            case CLOSABLE_WALL:
+            case ROOM:
+                return true;
+        }
+        return false;
+        //TODO fix
+    }
+
     public static Optional<ElementType> of(final String type) {
         if (type == null) {
             return Optional.empty();

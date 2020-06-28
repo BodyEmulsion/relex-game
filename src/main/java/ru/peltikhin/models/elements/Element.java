@@ -10,15 +10,10 @@ public class Element {
     private Boolean isStart = false;
     private Boolean isFinish = false;
 
-    public Boolean getContainBall() {
-        return isContainBall;
+    public Element() {
     }
 
-    public void setContainBall(Boolean containBall) {
-        isContainBall = containBall;
-    }
-
-    public Boolean getStart() {
+    public Boolean isStart() {
         return isStart;
     }
 
@@ -26,7 +21,7 @@ public class Element {
         isStart = start;
     }
 
-    public Boolean getEnd() {
+    public Boolean isFinish() {
         return isFinish;
     }
 
@@ -34,10 +29,7 @@ public class Element {
         isFinish = end;
     }
 
-    public Element() {
-    }
-
-    public Boolean getOpen() {
+    public Boolean isOpen() {
         return isOpen;
     }
 

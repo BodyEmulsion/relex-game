@@ -3,20 +3,22 @@ package ru.peltikhin.models;
 import ru.peltikhin.models.elements.Element;
 import ru.peltikhin.models.elements.ElementType;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Field {
     private Element[][] field;
-    private Coordinate ballCoordinate = new Coordinate(0,0);
+    private Coordinate ballCoordinate;
 
     public Field(Element[][] field) {
         this.field = field;
         for(int i = 0;i<8;i++){
             for (int j = 0;j<8;j++){
-                if(field[i][j].getStart()){
-                    ballCoordinate.setX(i);
-                    ballCoordinate.setY(j);
+                if(field[i][j].isStart()){
+                    ballCoordinate = new Coordinate(i,j);
                     field[i][j].setIsContainBall(true);
                 }
             }
@@ -38,19 +40,19 @@ public class Field {
         switch (directions){
             case LEFT:
                 return (ballCoordinate.getX()-1>=0) &&
-                        (getElement(getCoordinateAroundBall(Directions.LEFT)).getOpen()) &&
+                        (getElement(getCoordinateAroundBall(Directions.LEFT)).isCanContaineBall()) &&
                         (getElement(getCoordinateAroundBall(Directions.LEFT)).getAltitude() < getElement(ballCoordinate).getAltitude());
             case RIGHT:
                 return (ballCoordinate.getX()+1<=7) &&
-                        (getElement(getCoordinateAroundBall(Directions.RIGHT)).getOpen()) &&
+                        (getElement(getCoordinateAroundBall(Directions.RIGHT)).isCanContaineBall()) &&
                         (getElement(getCoordinateAroundBall(Directions.RIGHT)).getAltitude() < getElement(ballCoordinate).getAltitude());
             case DOWN:
                 return (ballCoordinate.getY()+1<=7) &&
-                        (getElement(getCoordinateAroundBall(Directions.DOWN)).getOpen()) &&
+                        (getElement(getCoordinateAroundBall(Directions.DOWN)).isCanContaineBall()) &&
                         (getElement(getCoordinateAroundBall(Directions.DOWN)).getAltitude() < getElement(ballCoordinate).getAltitude());
             case UP:
-                return (ballCoordinate.getY()-1>0) &&
-                        (getElement(getCoordinateAroundBall(Directions.UP)).getOpen()) &&
+                return (ballCoordinate.getY()-1>=0) &&
+                        (getElement(getCoordinateAroundBall(Directions.UP)).isCanContaineBall()) &&
                         (getElement(getCoordinateAroundBall(Directions.UP)).getAltitude() < getElement(ballCoordinate).getAltitude());
             default:
                 System.out.println("ПРоблемы в енаме с направлениями или в field");
@@ -64,7 +66,7 @@ public class Field {
     }
 
     public boolean isBallOnFinish() {
-        return field[ballCoordinate.getX()][ballCoordinate.getY()].getEnd();
+        return field[ballCoordinate.getX()][ballCoordinate.getY()].isFinish();
     }
 
     public void ReverseDynamicWalls(int gameTime) {
@@ -73,7 +75,7 @@ public class Field {
                 if ((element.getElementType() == ElementType.OPENABLE_WALL ||
                         element.getElementType() == ElementType.CLOSABLE_WALL) &&
                         (gameTime+element.getFirstMoveTime())%element.getPeriod()==0){
-                    element.setOpen(!element.getOpen());
+                    element.setOpen(!element.isOpen());
                 }
             }
         }
@@ -105,12 +107,17 @@ public class Field {
     }
 
     public void selectBestOption(List<Directions> options) {
-        Coordinate coordinate = options.stream()
+        List<Coordinate> coordinates = options.stream()
                 .map(this::getCoordinateAroundBall)
-                .min(Comparator.comparingInt(comparatorCoordinate -> getElement(comparatorCoordinate).getAltitude()))
-                .get();
-        moveBallByCoordinate(coordinate);
-        //TODO НЕТ РАНДОМА ПРИ НАХОЖДЕНИИ ОДИНАКОВОЙ ВЫСОТЫ
+                .collect(Collectors.toList());
 
+        coordinates.removeIf(coordinate -> {
+            return getElement(coordinate).getAltitude() >
+                    getElement(Collections.min(coordinates, Comparator.comparingInt(element -> {
+                        return getElement(element).getAltitude();
+                    }))).getAltitude();
+        });
+
+        moveBallByCoordinate(coordinates.get(new Random().nextInt(coordinates.size())));
     }
 }
