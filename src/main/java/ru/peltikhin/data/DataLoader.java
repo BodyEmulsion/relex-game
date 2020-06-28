@@ -104,8 +104,8 @@ public class DataLoader {
         return new Field(field);
     }
 
-    public void saveResult(String result) throws IOException {
-        Files.write(Path.of(outputName), result.getBytes());
+    public void saveResult(StringBuilder result) throws IOException {
+        Files.write(Path.of(outputName), result.toString().getBytes());
     }
 
 }

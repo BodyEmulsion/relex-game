@@ -2,15 +2,26 @@ package ru.peltikhin.models.elements;
 
 public class Element {
     private ElementType elementType;
-    private Integer period;
-    private Integer firstMoveTime;
-    private Integer altitude;
-    private Boolean isOpen = false;
-    private Boolean isContainBall = false;
-    private Boolean isStart = false;
-    private Boolean isFinish = false;
+    private int period;
+    private int firstMoveTime;
+    private int altitude;
+    private boolean isOpen = false;
+    private boolean isContainBall = false;
+    private boolean isStart = false;
+    private boolean isFinish = false;
 
     public Element() {
+    }
+
+    public Element(Element that) {
+        this.elementType = that.elementType;
+        this.period = that.period;
+        this.firstMoveTime = that.firstMoveTime;
+        this.altitude = that.altitude;
+        this.isOpen = that.isOpen;
+        this.isContainBall = that.isContainBall;
+        this.isStart = that.isStart;
+        this.isFinish = that.isFinish;
     }
 
     public Boolean isStart() {
@@ -61,16 +72,6 @@ public class Element {
         this.altitude = altitude;
     }
 
-    public  Boolean isCanContaineBall(){
-        if(elementType == ElementType.WALL){
-            return false;
-        } else if(elementType == ElementType.ROOM) {
-            return true;
-        } else {
-            return isOpen;
-        }
-    }
-
     public void setElementType(ElementType elementType) {
         this.elementType = elementType;
     }
@@ -86,15 +87,15 @@ public class Element {
             return "[X]";
         } else if (elementType == ElementType.ROOM){
             if(isStart){
-                return "|" + altitude.toString() + "|";
+                return "|" + altitude + "|";
             } else if(isFinish){
-                return "{" + altitude.toString() + "}";
+                return "{" + altitude + "}";
             } else {
-                return "[" + altitude.toString() + "]";
+                return "[" + altitude + "]";
             }
         } else {
             if(isOpen){
-                return "[" + altitude.toString() + "]";
+                return "[" + altitude + "]";
             } else {
                 return "[X]";
             }

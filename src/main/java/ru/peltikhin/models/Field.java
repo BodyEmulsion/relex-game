@@ -6,8 +6,6 @@ import ru.peltikhin.models.elements.ElementType;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 public class Field {
     private Element[][] field;
@@ -25,39 +23,36 @@ public class Field {
         }
     }
 
-    public StringBuilder getFieldView() {
-        StringBuilder result = new StringBuilder();
-        for(int i=0;i<8;i++){
-            for(int j=0;j<8;j++){
-                result.append(field[j][i].getView());
+    public Field(Field that){
+        this.field = new Element[8][8];
+        for(int i = 0;i<8;i++){
+            for (int j = 0;j<8;j++){
+                this.field[i][j]= new Element(that.field[i][j]);
             }
-            result.append("\n");
         }
-        return result;
+        this.ballCoordinate = new Coordinate(that.ballCoordinate);
     }
 
     public boolean canBallMove(Directions directions) {
         switch (directions){
             case LEFT:
                 return (ballCoordinate.getX()-1>=0) &&
-                        (getElement(getCoordinateAroundBall(Directions.LEFT)).isCanContaineBall()) &&
+                        (getElement(getCoordinateAroundBall(Directions.LEFT)).isOpen()) &&
                         (getElement(getCoordinateAroundBall(Directions.LEFT)).getAltitude() < getElement(ballCoordinate).getAltitude());
             case RIGHT:
                 return (ballCoordinate.getX()+1<=7) &&
-                        (getElement(getCoordinateAroundBall(Directions.RIGHT)).isCanContaineBall()) &&
+                        (getElement(getCoordinateAroundBall(Directions.RIGHT)).isOpen()) &&
                         (getElement(getCoordinateAroundBall(Directions.RIGHT)).getAltitude() < getElement(ballCoordinate).getAltitude());
             case DOWN:
                 return (ballCoordinate.getY()+1<=7) &&
-                        (getElement(getCoordinateAroundBall(Directions.DOWN)).isCanContaineBall()) &&
+                        (getElement(getCoordinateAroundBall(Directions.DOWN)).isOpen()) &&
                         (getElement(getCoordinateAroundBall(Directions.DOWN)).getAltitude() < getElement(ballCoordinate).getAltitude());
             case UP:
                 return (ballCoordinate.getY()-1>=0) &&
-                        (getElement(getCoordinateAroundBall(Directions.UP)).isCanContaineBall()) &&
+                        (getElement(getCoordinateAroundBall(Directions.UP)).isOpen()) &&
                         (getElement(getCoordinateAroundBall(Directions.UP)).getAltitude() < getElement(ballCoordinate).getAltitude());
             default:
-                System.out.println("ПРоблемы в енаме с направлениями или в field");
-                //TODO исправить
-                return false;
+                throw new UnknownError("It's impossible, but suddenly");
         }
     }
 
@@ -91,8 +86,9 @@ public class Field {
                 return new Coordinate(ballCoordinate.getX(),ballCoordinate.getY()+1);
             case UP:
                 return new Coordinate(ballCoordinate.getX(),ballCoordinate.getY()-1);
+            default:
+                throw new UnknownError("It's impossible, but suddenly");
         }
-        return null;
     }
 
     private void moveBallByCoordinate(Coordinate coordinate){
@@ -106,18 +102,24 @@ public class Field {
         return field[coordinate.getX()][coordinate.getY()];
     }
 
-    public void selectBestOption(List<Directions> options) {
-        List<Coordinate> coordinates = options.stream()
-                .map(this::getCoordinateAroundBall)
-                .collect(Collectors.toList());
-
-        coordinates.removeIf(coordinate -> {
-            return getElement(coordinate).getAltitude() >
-                    getElement(Collections.min(coordinates, Comparator.comparingInt(element -> {
-                        return getElement(element).getAltitude();
-                    }))).getAltitude();
+    public List<Directions> getProbableOption(List<Directions> options) {
+        options.removeIf(directions -> {
+            return getElement(getCoordinateAroundBall(directions)).getAltitude() >
+                    getElement(getCoordinateAroundBall(Collections.min(options, Comparator.comparingInt(element -> {
+                        return getElement(getCoordinateAroundBall(element)).getAltitude();
+                    })))).getAltitude();
         });
+        return options;
+    }
 
-        moveBallByCoordinate(coordinates.get(new Random().nextInt(coordinates.size())));
+    public StringBuilder getFieldView() {
+        StringBuilder result = new StringBuilder();
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                result.append(field[j][i].getView());
+            }
+            result.append("\n");
+        }
+        return result;
     }
 }

@@ -2,7 +2,7 @@ package ru.peltikhin.models.elements;
 
 import java.util.Optional;
 
-public enum ElementType {
+public enum ElementType{
     ROOM("R"),
     WALL("W"),
     OPENABLE_WALL("O"),
@@ -14,6 +14,10 @@ public enum ElementType {
         this.type = type;
     }
 
+    ElementType(ElementType that){
+        this.type = that.type;
+    }
+
     public boolean getStartPosition(){
         switch (this){
             case OPENABLE_WALL:
@@ -22,9 +26,9 @@ public enum ElementType {
             case CLOSABLE_WALL:
             case ROOM:
                 return true;
+            default:
+                throw new UnknownError("It's impossible, but suddenly");
         }
-        return false;
-        //TODO fix
     }
 
     public static Optional<ElementType> of(final String type) {
