@@ -8,7 +8,7 @@ public class Element {
     private Boolean isOpen = false;
     private Boolean isContainBall = false;
     private Boolean isStart = false;
-    private Boolean isEnd = false;
+    private Boolean isFinish = false;
 
     public Boolean getContainBall() {
         return isContainBall;
@@ -27,11 +27,11 @@ public class Element {
     }
 
     public Boolean getEnd() {
-        return isEnd;
+        return isFinish;
     }
 
     public void setEnd(Boolean end) {
-        isEnd = end;
+        isFinish = end;
     }
 
     public Element() {
@@ -90,11 +90,16 @@ public class Element {
     public String getView() {
         if(isContainBall){
             return "[o]";
-        }
-        if(elementType == ElementType.WALL){
+        } else if(elementType == ElementType.WALL){
             return "[X]";
         } else if (elementType == ElementType.ROOM){
-            return "[" + altitude.toString() + "]";
+            if(isStart){
+                return "|" + altitude.toString() + "|";
+            } else if(isFinish){
+                return "{" + altitude.toString() + "}";
+            } else {
+                return "[" + altitude.toString() + "]";
+            }
         } else {
             if(isOpen){
                 return "[" + altitude.toString() + "]";

@@ -41,8 +41,9 @@ public class DataLoader {
                             case ROOM:
                                 resultElement.setElementType(ElementType.ROOM);
                                 resultElement.setAltitude(Integer.parseInt(parameters.get(1)));
-                                resultElement.setStart(Boolean.getBoolean(parameters.get(2)));
-                                resultElement.setEnd(Boolean.getBoolean(parameters.get(3)));
+                                resultElement.setStart(Boolean.parseBoolean(parameters.get(2)));
+                                resultElement.setEnd(Boolean.parseBoolean(parameters.get(3)));
+                                resultElement.setOpen(true);
                                 break;
                             case CLOSABLE_WALL:
                                 resultElement.setElementType(ElementType.CLOSABLE_WALL);
