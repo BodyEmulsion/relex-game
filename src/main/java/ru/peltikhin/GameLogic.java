@@ -53,6 +53,7 @@ public class GameLogic {
                 case 1:
                     field.BallMove(moveVariations.get(0));
                     moveVariations.clear();
+                    break;
                 case 2:
                 case 3:
                 case 4:
