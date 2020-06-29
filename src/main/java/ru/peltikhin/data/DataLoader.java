@@ -1,7 +1,9 @@
 package ru.peltikhin.data;
 
 import ru.peltikhin.models.Field;
+import ru.peltikhin.models.ResultSimulation;
 import ru.peltikhin.models.elements.Element;
+import ru.peltikhin.models.elements.ElementFunction;
 import ru.peltikhin.models.elements.ElementType;
 
 import java.io.IOException;
@@ -9,28 +11,53 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.InputMismatchException;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DataLoader {
-    private String inputName;
-    private String outputName;
+    private String mapFileName;
+    private String outputFileName;
+    private String inputSettingsFileName;
 
-    public DataLoader(String inputName, String outputName) {
-        this.inputName = inputName;
-        this.outputName = outputName;
+    public DataLoader(String mapFileName, String outputFileName, String inputSettingsFileName) {
+        this.mapFileName = mapFileName;
+        this.outputFileName = outputFileName;
+        this.inputSettingsFileName = inputSettingsFileName;
+    }
+
+    public int getGameStartTime() throws IOException {
+        return Integer.parseInt(Files.readString(Path.of(inputSettingsFileName), StandardCharsets.UTF_8).trim());
+
     }
 
     public Field getField() throws IOException {
         List<Element> elements = Files
-                .lines(Paths.get(inputName), StandardCharsets.UTF_8)
+                .lines(Paths.get(mapFileName), StandardCharsets.UTF_8)
                 .flatMap(string -> Stream.of(string.split(" ")))
                 .map(this::parseElement)
                 .collect(Collectors.toList());
         return createField(elements);
+    }
+
+    public void saveResult(List<ResultSimulation> resultSimulations) throws IOException {
+        StringBuilder output = new StringBuilder();
+        for(var resultSimulation: resultSimulations){
+            output
+                    .append("Simulation branch id: ")
+                    .append(resultSimulation.getId())
+                    .append("\n")
+                    .append("Game time: ")
+                    .append(resultSimulation.getGameTime())
+                    .append("\n")
+                    .append(resultSimulation.isWined()?"Success":"Failure")
+                    .append("\n")
+                    .append("result view: \n")
+                    .append(resultSimulation.getEndSimulationView());
+        }
+        output.append("\n");
+        output.append(getResultFirstTask(resultSimulations));
+        Files.write(Path.of(outputFileName), output.toString().getBytes());
     }
 
     private Element parseElement(String input) throws InputMismatchException {
@@ -64,12 +91,11 @@ public class DataLoader {
     private Element createRoom(List<String> parameters)throws InputMismatchException{
         Element resultElement = new Element();
         resultElement.setElementType(ElementType.ROOM);
-        if (parameters.size()!=4) {
+        if (parameters.size()!=3) {
             throw new InputMismatchException("Error in parse element, wrong parameters number");
         }
         resultElement.setAltitude(Integer.parseInt(parameters.get(1)));
-        resultElement.setStart(Boolean.parseBoolean(parameters.get(2)));
-        resultElement.setEnd(Boolean.parseBoolean(parameters.get(3)));
+        resultElement.setElementFunction(ElementFunction.of(parameters.get(2)).get());
         resultElement.setOpen(ElementType.ROOM.getStartPosition());
         return resultElement;
     }
@@ -77,12 +103,11 @@ public class DataLoader {
     private Element createDynamicWall(List<String> parameters, ElementType dynamicWallType) throws InputMismatchException{
         Element resultElement = new Element();
         resultElement.setElementType(dynamicWallType);
-        if (parameters.size()!=4) {
+        if (parameters.size()!=3) {
             throw new InputMismatchException("Error in parse element, wrong parameters number");
         }
         resultElement.setAltitude(Integer.parseInt(parameters.get(1)));
-        resultElement.setFirstMoveTime(Integer.parseInt(parameters.get(2)));
-        resultElement.setPeriod(Integer.parseInt(parameters.get(3)));
+        resultElement.setPeriod(Integer.parseInt(parameters.get(2)));
         resultElement.setOpen(dynamicWallType.getStartPosition());
         return resultElement;
     }
@@ -104,8 +129,25 @@ public class DataLoader {
         return new Field(field);
     }
 
-    public void saveResult(StringBuilder result) throws IOException {
-        Files.write(Path.of(outputName), result.toString().getBytes());
+    private String getResultFirstTask(List<ResultSimulation> resultSimulations){
+        resultSimulations.removeIf(result -> !result.isWined());
+        if(!resultSimulations.isEmpty()){
+            ResultSimulation result = Collections.min(resultSimulations,
+                    Comparator.comparingInt(ResultSimulation::getGameTime));
+            return "Game end time: " + String.valueOf(result.getGameTime());
+        } else {
+            return "There is no decision";
+        }
     }
+
+    private String getResultSecondTask(List<ResultSimulation> resultSimulations){
+        resultSimulations.removeIf(ResultSimulation::isWined);
+        if(!resultSimulations.isEmpty()){
+            return "Always success";
+        } else {
+            return "Not always success";
+        }
+    }
+
 
 }

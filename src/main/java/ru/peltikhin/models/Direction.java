@@ -2,7 +2,7 @@ package ru.peltikhin.models;
 
 import java.util.Optional;
 
-public enum Directions {
+public enum Direction {
     UP("UP"),
     DOWN("DOWN"),
     RIGHT("RIGHT"),
@@ -10,16 +10,16 @@ public enum Directions {
 
     private final String type;
 
-    Directions(String type) {
+    Direction(String type) {
         this.type = type;
     }
 
-    public static Optional<Directions> of(final String type) {
+    public static Optional<Direction> of(final String type) {
         if (type == null) {
             return Optional.empty();
         }
 
-        for (var value : Directions.values()) {
+        for (var value : Direction.values()) {
             if (value.type.equals(type)) {
                 return Optional.of(value);
             }

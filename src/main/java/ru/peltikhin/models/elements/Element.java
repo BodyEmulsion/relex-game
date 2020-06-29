@@ -3,12 +3,10 @@ package ru.peltikhin.models.elements;
 public class Element {
     private ElementType elementType;
     private int period;
-    private int firstMoveTime;
     private int altitude;
     private boolean isOpen = false;
     private boolean isContainBall = false;
-    private boolean isStart = false;
-    private boolean isFinish = false;
+    private ElementFunction elementFunction;
 
     public Element() {
     }
@@ -16,28 +14,26 @@ public class Element {
     public Element(Element that) {
         this.elementType = that.elementType;
         this.period = that.period;
-        this.firstMoveTime = that.firstMoveTime;
         this.altitude = that.altitude;
         this.isOpen = that.isOpen;
         this.isContainBall = that.isContainBall;
-        this.isStart = that.isStart;
-        this.isFinish = that.isFinish;
+        this.elementFunction = that.elementFunction;
+    }
+
+    public ElementFunction getElementFunction() {
+        return elementFunction;
+    }
+
+    public void setElementFunction(ElementFunction elementFunction) {
+        this.elementFunction = elementFunction;
     }
 
     public Boolean isStart() {
-        return isStart;
-    }
-
-    public void setStart(Boolean start) {
-        isStart = start;
+        return elementFunction==ElementFunction.START;
     }
 
     public Boolean isFinish() {
-        return isFinish;
-    }
-
-    public void setEnd(Boolean end) {
-        isFinish = end;
+        return elementFunction==ElementFunction.FINISH;
     }
 
     public Boolean isOpen() {
@@ -54,14 +50,6 @@ public class Element {
 
     public void setPeriod(Integer period) {
         this.period = period;
-    }
-
-    public Integer getFirstMoveTime() {
-        return firstMoveTime;
-    }
-
-    public void setFirstMoveTime(Integer firstMoveTime) {
-        this.firstMoveTime = firstMoveTime;
     }
 
     public Integer getAltitude() {
@@ -86,12 +74,15 @@ public class Element {
         } else if(elementType == ElementType.WALL){
             return "[X]";
         } else if (elementType == ElementType.ROOM){
-            if(isStart){
-                return "|" + altitude + "|";
-            } else if(isFinish){
-                return "{" + altitude + "}";
-            } else {
-                return "[" + altitude + "]";
+            switch (elementFunction){
+                case START:
+                    return "|" + altitude + "|";
+                case FINISH:
+                    return "{" + altitude + "}";
+                case DEFAULT:
+                    return "[" + altitude + "]";
+                default:
+                    throw new UnknownError("It's impossible, but suddenly");
             }
         } else {
             if(isOpen){
@@ -100,11 +91,6 @@ public class Element {
                 return "[X]";
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return getElementType().getType()+ ":" + getAltitude()+ ":" +getFirstMoveTime() +":" +getPeriod() + " ";
     }
 
     public Boolean getIsContainBall() {

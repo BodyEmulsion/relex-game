@@ -33,31 +33,39 @@ public class Field {
         this.ballCoordinate = new Coordinate(that.ballCoordinate);
     }
 
-    public boolean canBallMove(Directions directions) {
-        switch (directions){
-            case LEFT:
-                return (ballCoordinate.getX()-1>=0) &&
-                        (getElement(getCoordinateAroundBall(Directions.LEFT)).isOpen()) &&
-                        (getElement(getCoordinateAroundBall(Directions.LEFT)).getAltitude() < getElement(ballCoordinate).getAltitude());
-            case RIGHT:
-                return (ballCoordinate.getX()+1<=7) &&
-                        (getElement(getCoordinateAroundBall(Directions.RIGHT)).isOpen()) &&
-                        (getElement(getCoordinateAroundBall(Directions.RIGHT)).getAltitude() < getElement(ballCoordinate).getAltitude());
-            case DOWN:
-                return (ballCoordinate.getY()+1<=7) &&
-                        (getElement(getCoordinateAroundBall(Directions.DOWN)).isOpen()) &&
-                        (getElement(getCoordinateAroundBall(Directions.DOWN)).getAltitude() < getElement(ballCoordinate).getAltitude());
-            case UP:
-                return (ballCoordinate.getY()-1>=0) &&
-                        (getElement(getCoordinateAroundBall(Directions.UP)).isOpen()) &&
-                        (getElement(getCoordinateAroundBall(Directions.UP)).getAltitude() < getElement(ballCoordinate).getAltitude());
-            default:
-                throw new UnknownError("It's impossible, but suddenly");
-        }
+    public boolean canBallMove(Direction direction) {
+        return (
+                getCoordinateAroundBall(direction).getY() >= 0 &&
+                getCoordinateAroundBall(direction).getY() <= 7 &&
+                getCoordinateAroundBall(direction).getX() >= 0 &&
+                getCoordinateAroundBall(direction).getX() <= 7 &&
+                getElement(getCoordinateAroundBall(direction)).getAltitude() < getElement(ballCoordinate).getAltitude()
+        );
+//        switch (direction){
+//            case LEFT:
+//                return (ballCoordinate.getX()-1>=0) &&
+//                        (getElement(getCoordinateAroundBall(Direction.LEFT)).isOpen()) &&
+//                        (getElement(getCoordinateAroundBall(Direction.LEFT)).getAltitude() < getElement(ballCoordinate).getAltitude());
+//            case RIGHT:
+//                return (ballCoordinate.getX()+1<=7) &&
+//                        (getElement(getCoordinateAroundBall(Direction.RIGHT)).isOpen()) &&
+//                        (getElement(getCoordinateAroundBall(Direction.RIGHT)).getAltitude() < getElement(ballCoordinate).getAltitude());
+//            case DOWN:
+//                return (ballCoordinate.getY()+1<=7) &&
+//                        (getElement(getCoordinateAroundBall(Direction.DOWN)).isOpen()) &&
+//                        (getElement(getCoordinateAroundBall(Direction.DOWN)).getAltitude() < getElement(ballCoordinate).getAltitude());
+//            case UP:
+//                return (ballCoordinate.getY()-1>=0) &&
+//                        (getElement(getCoordinateAroundBall(Direction.UP)).isOpen()) &&
+//                        (getElement(getCoordinateAroundBall(Direction.UP)).getAltitude() < getElement(ballCoordinate).getAltitude());
+//            default:
+//                throw new UnknownError("It's impossible, but suddenly");
+//        }
+        //TODO select
     }
 
-    public void BallMove(Directions directions) {
-       moveBallByCoordinate(getCoordinateAroundBall(directions));
+    public void BallMove(Direction direction) {
+       moveBallByCoordinate(getCoordinateAroundBall(direction));
     }
 
     public boolean isBallOnFinish() {
@@ -67,16 +75,17 @@ public class Field {
     public void ReverseDynamicWalls(int gameTime) {
         for(var elements: field){
             for(var element: elements){
-                if ((element.getElementType() == ElementType.OPENABLE_WALL ||
+                if ((
+                        element.getElementType() == ElementType.OPENABLE_WALL ||
                         element.getElementType() == ElementType.CLOSABLE_WALL) &&
-                        (gameTime+element.getFirstMoveTime())%element.getPeriod()==0){
+                        gameTime % element.getPeriod() == 0){
                     element.setOpen(!element.isOpen());
                 }
             }
         }
     }
 
-    private Coordinate getCoordinateAroundBall(Directions direction){
+    private Coordinate getCoordinateAroundBall(Direction direction){
         switch (direction){
             case LEFT:
                 return new Coordinate(ballCoordinate.getX()-1,ballCoordinate.getY());
@@ -93,8 +102,7 @@ public class Field {
 
     private void moveBallByCoordinate(Coordinate coordinate){
         field[ballCoordinate.getX()][ballCoordinate.getY()].setIsContainBall(false);
-        ballCoordinate.setX(coordinate.getX());
-        ballCoordinate.setY(coordinate.getY());
+        ballCoordinate = coordinate;
         field[ballCoordinate.getX()][ballCoordinate.getY()].setIsContainBall(true);
     }
 
@@ -102,13 +110,21 @@ public class Field {
         return field[coordinate.getX()][coordinate.getY()];
     }
 
-    public List<Directions> getProbableOption(List<Directions> options) {
-        options.removeIf(directions -> {
-            return getElement(getCoordinateAroundBall(directions)).getAltitude() >
+    public List<Direction> getProbableMoveVariations(List<Direction> options) {
+        options.removeIf(direction -> {
+            return getElement(getCoordinateAroundBall(direction)).getAltitude() >
                     getElement(getCoordinateAroundBall(Collections.min(options, Comparator.comparingInt(element -> {
                         return getElement(getCoordinateAroundBall(element)).getAltitude();
                     })))).getAltitude();
         });
+//        int minimumAltitude = getElement(getCoordinateAroundBall(
+//                Collections.min(options, Comparator.comparingInt(element ->
+//                        getElement(getCoordinateAroundBall(element)).getAltitude())))).getAltitude();
+//
+//        options.removeIf(direction -> {
+//            return getElement(getCoordinateAroundBall(direction)).getAltitude() > minimumAltitude;
+//        });
+        //TODO select or repair
         return options;
     }
 
