@@ -1,0 +1,26 @@
+Simulation branch id: 0
+Game time: 3
+Failure
+result view: 
+[o][X][7][X][X][X][X][X]
+|10|[9][8][7][X][X][X][X]
+[X][X][7][X][X][X][X][X]
+[X][X][X][X][X][X][X][X]
+[X][X]{5}[X][X][X][X][X]
+[X][X][X][X][X][X][X][X]
+[X][X][X][X][X][X][X][X]
+[3][X][X][X][X][X][X][X]
+Simulation branch id: 1
+Game time: 3
+Failure
+result view: 
+[X][X][7][X][X][X][X][X]
+|10|[9][8][7][X][X][X][X]
+[o][X][7][X][X][X][X][X]
+[X][X][X][X][X][X][X][X]
+[X][X]{5}[X][X][X][X][X]
+[X][X][X][X][X][X][X][X]
+[X][X][X][X][X][X][X][X]
+[3][X][X][X][X][X][X][X]
+
+There is no decision

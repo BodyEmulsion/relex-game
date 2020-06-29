@@ -62,7 +62,9 @@ public class GameLogic {
                     return resultSimulationList;
             }
             wined = field.isBallOnFinish();
-            gameWorking = wined || gameWorking;
+            if(wined){
+                gameWorking = false;
+            }
             field.ReverseDynamicWalls(gameTime);
             gameTime++;
         }

@@ -1,0 +1,8 @@
+W W R:7:D W W W W O:5:2
+R:10:S R:9:D R:8:D R:7:D W W W W
+W W R:7:D W W W W W
+W W O:6:2 W W W W W
+W W R:5:F W W W W W
+W W W W W W W W
+W W W W W W W W
+C:3:5 W W W W W W O:3:5

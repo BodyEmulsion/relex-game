@@ -34,12 +34,12 @@ public class Field {
     }
 
     public boolean canBallMove(Direction direction) {
-        return (
-                getCoordinateAroundBall(direction).getY() >= 0 &&
-                getCoordinateAroundBall(direction).getY() <= 7 &&
-                getCoordinateAroundBall(direction).getX() >= 0 &&
-                getCoordinateAroundBall(direction).getX() <= 7 &&
-                getElement(getCoordinateAroundBall(direction)).getAltitude() < getElement(ballCoordinate).getAltitude()
+        Coordinate coordinateOfPotentialMove = getCoordinateAroundBall(direction);
+        return (coordinateOfPotentialMove.getY() >= 0 &&
+                coordinateOfPotentialMove.getY() <= 7 &&
+                coordinateOfPotentialMove.getX() >= 0 &&
+                coordinateOfPotentialMove.getX() <= 7 &&
+                getElement(coordinateOfPotentialMove).getAltitude() < getElement(ballCoordinate).getAltitude()
         );
 //        switch (direction){
 //            case LEFT:
@@ -110,12 +110,16 @@ public class Field {
         return field[coordinate.getX()][coordinate.getY()];
     }
 
-    public List<Direction> getProbableMoveVariations(List<Direction> options) {
-        options.removeIf(direction -> {
-            return getElement(getCoordinateAroundBall(direction)).getAltitude() >
-                    getElement(getCoordinateAroundBall(Collections.min(options, Comparator.comparingInt(element -> {
-                        return getElement(getCoordinateAroundBall(element)).getAltitude();
-                    })))).getAltitude();
+    private Element getElementAroundBall(Direction direction){
+        return getElement(getCoordinateAroundBall(direction));
+    }
+
+    public List<Direction> getProbableMoveVariations(List<Direction> directions) {
+        directions.removeIf(direction -> {
+            return getElementAroundBall(direction).getAltitude() >
+                    getElementAroundBall(Collections.min(directions, Comparator.comparingInt(item -> {
+                        return getElementAroundBall(item).getAltitude();
+                    }))).getAltitude();
         });
 //        int minimumAltitude = getElement(getCoordinateAroundBall(
 //                Collections.min(options, Comparator.comparingInt(element ->
@@ -125,7 +129,7 @@ public class Field {
 //            return getElement(getCoordinateAroundBall(direction)).getAltitude() > minimumAltitude;
 //        });
         //TODO select or repair
-        return options;
+        return directions;
     }
 
     public StringBuilder getFieldView() {
